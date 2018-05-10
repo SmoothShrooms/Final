@@ -125,15 +125,16 @@ class AI_Controller : ZilchComponent
             this.NextShot = event.TimePassed + this.ShootDelay;
         
             // Create a projectile originating from the enemy's position
-            /*var projectileObject = this.Space.CreateAtPosition(Archetype.Find("Projectile"), this.Owner.Transform.Translation);
+            var projectileObject = this.Space.CreateAtPosition(Archetype.Find("Projectile"), this.Owner.Transform.Translation);
             if (projectileObject != null)
             {
                 // Shoot in the direction of the target (which is the same as the chase Direction)
                 projectileObject.Projectile.Direction = this.ChaseDirection;
+
                 // Make sure projectile moves faster than the enemy
                 projectileObject.Projectile.Speed = 15.0 + this.ChaseSpeed;
             }
-            */
+            
         }
     }
 
