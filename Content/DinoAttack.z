@@ -4,8 +4,6 @@ class DinoAttack : ZilchComponent
   {
     Zero.Connect(Zero.Keyboard, Events.KeyDown, this.OnKeyDown);
   }
-  
-  //BIG CHANGE
 
   function OnKeyDown(event : KeyboardEvent)
  {

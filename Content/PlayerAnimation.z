@@ -3,12 +3,11 @@ class PlayerAnimation : ZilchComponent
     //Standing Still
     [Property]
     var Class : SpriteSource = null;
+    [Property]
+    var ClimbStill : SpriteSource = null;
     //Moving Left
     [Property]
-    var ClassLeftAnimation : SpriteSource = null;
-    //Moving right
-    [Property]
-    var ClassRightAnimation : SpriteSource = null;
+    var ClassWalkAnimation : SpriteSource = null;
     //Jump Animation
     [Property]
     var ClassJump : SpriteSource = null;
@@ -20,9 +19,11 @@ class PlayerAnimation : ZilchComponent
 
     var AttackAnimationActive : Boolean = false;
     
+    var CurrentScale : Real3;
+    
     function Initialize(init : CogInitializer)
     {
-        
+        this.CurrentScale = this.Owner.Transform.Scale;
         Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
     }
 
@@ -54,24 +55,32 @@ class PlayerAnimation : ZilchComponent
                 this.Owner.Sprite.SpriteSource = this.ClassJump;
             }
             
-            else if(Zero.Keyboard.KeyIsDown(Keys.A) && this.Owner.Sprite.SpriteSource != this.ClassLeftAnimation && this.Owner.SweptController.Grounded)
+            else if(Zero.Keyboard.KeyIsDown(Keys.A) && this.Owner.Sprite.SpriteSource != this.ClassWalkAnimation && this.Owner.SweptController.Grounded)
             {
-             
-                this.Owner.Sprite.SpriteSource = this.ClassLeftAnimation;
+                this.Owner.Sprite.AnimationActive = true;
+                this.Owner.Sprite.SpriteSource = this.ClassWalkAnimation;
                 this.Owner.Sprite.FlipX = false;
             }
              
-            else if(Zero.Keyboard.KeyIsDown(Keys.D) && this.Owner.Sprite.SpriteSource != this.ClassRightAnimation && this.Owner.SweptController.Grounded)
+            else if(Zero.Keyboard.KeyIsDown(Keys.D) && this.Owner.Sprite.SpriteSource != this.ClassWalkAnimation && this.Owner.SweptController.Grounded)
             {
-             
-                this.Owner.Sprite.SpriteSource = this.ClassRightAnimation;
+                this.Owner.Sprite.AnimationActive = true;
+                this.Owner.Sprite.SpriteSource = this.ClassWalkAnimation;
                 this.Owner.Sprite.FlipX = false;
            
             }
             else if(Zero.Keyboard.KeyIsUp(Keys.A) && Zero.Keyboard.KeyIsUp(Keys.D) && Zero.Keyboard.KeyIsUp(Keys.Space) 
-                && this.Owner.SweptController.Grounded && Zero.Keyboard.KeyIsUp(Keys.E) && this.Owner.Sprite.SpriteSource != this.Class)
+                 && Zero.Keyboard.KeyIsUp(Keys.E) && this.Owner.Sprite.SpriteSource != this.Class)
             {
-                this.Owner.Sprite.SpriteSource = this.Class;
+                if(this.Owner.SweptController.Grounded)
+                {
+                    this.Owner.Sprite.SpriteSource = this.Class;
+                }
+                else if(!this.Owner.SweptController.Grounded && this.Owner.Sprite.SpriteSource != this.ClassJump)
+                {
+                    this.Owner.Sprite.SpriteSource = this.ClimbStill;
+                }
+                this.Owner.Sprite.AnimationActive = true;
                 //this.Owner.Sprite.FlipX = false;
             }
             
@@ -107,7 +116,27 @@ class PlayerAnimation : ZilchComponent
             this.AttackAnimationActive = false;
             this.Owner.Sprite.SpriteSource = SpriteSource.AlienClimbAnimation;
         }
-   
+        
+        if(this.Owner.Sprite.SpriteSource == this.ClassJump)
+        {
+            if(this.Owner.Sprite.CurrentFrame > 12)
+            {
+                this.Owner.Sprite.AnimationActive = false;
+            }
+            //Changing Scale while Jumping
+            if(this.Owner.Transform.Scale == this.CurrentScale)
+            {
+                this.Owner.Transform.Scale = Real3(5.0, 6.0, 1.0);
+                this.Owner.BoxCollider.Size = Real3(1.5, 1.3, 1.0);
+            }
+        }
+        
+        else if(this.Owner.Sprite.SpriteSource != this.ClassJump && this.Owner.Transform.Scale != this.CurrentScale)
+        {
+            this.Owner.Transform.Scale = this.CurrentScale;
+            this.Owner.BoxCollider.Size = Real3(1.5, 1.5, 1.0);
+        }
+        
    
     }
 }
